@@ -10,7 +10,16 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "interventions")
+@Table(name = "interventions",
+        indexes = {
+                @Index(name = "idx_intervention_student_id", columnList = "student_id"),
+                @Index(name = "idx_intervention_status", columnList = "status"),
+                @Index(name = "idx_intervention_type", columnList = "intervention_type"),
+                @Index(name = "idx_intervention_start_date", columnList = "start_date"),
+                @Index(name = "idx_intervention_target_date", columnList = "target_completion_date"),
+                @Index(name = "idx_intervention_student_status", columnList = "student_id, status"),
+                @Index(name = "idx_intervention_created_at", columnList = "created_at")
+        })
 public class Intervention {
 
     @Id
@@ -42,7 +51,7 @@ public class Intervention {
 
     @Size(max = 20)
     @Column(name = "status", length = 20)
-    private String status;
+    private String status; // ON_TRACK, NOT_ON_TRACK, COMPLETED
 
     @CreationTimestamp
     @Column(name = "created_at")
