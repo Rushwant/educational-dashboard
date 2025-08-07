@@ -47,23 +47,23 @@ private BehaviorRepository behaviorRepository;
             highRiskAcademic.setStudent(highRiskStudent);
             highRiskAcademic.setSemester("2024-Fall");
             highRiskAcademic.setCourse("Math");
-            highRiskAcademic.setGrade(new BigDecimal("58")); // Below 70
-            highRiskAcademic.setStateAssessmentMath(450);    // Below 500
+            highRiskAcademic.setGrade(new BigDecimal("58"));
+            highRiskAcademic.setStateAssessmentMath(450);
             academicPerformanceRepository.save(highRiskAcademic);
 
             Attendance highRiskAttendance = new Attendance();
             highRiskAttendance.setStudent(highRiskStudent);
             highRiskAttendance.setSemester("2024-Fall");
-            highRiskAttendance.setAttendanceRate(new BigDecimal("80")); // Below 90
-            highRiskAttendance.setAbsentDays(15); // > 10
-            highRiskAttendance.setTardyDays(9);   // > 5
+            highRiskAttendance.setAttendanceRate(new BigDecimal("80"));
+            highRiskAttendance.setAbsentDays(15);
+            highRiskAttendance.setTardyDays(9);
             attendanceRepository.save(highRiskAttendance);
 
             Behavior highRiskBehavior = new Behavior();
             highRiskBehavior.setStudent(highRiskStudent);
             highRiskBehavior.setSemester("2024-Fall");
-            highRiskBehavior.setDisciplinaryActions(5); // > 2
-            highRiskBehavior.setSuspensions(2);         // > 0
+            highRiskBehavior.setDisciplinaryActions(5);
+            highRiskBehavior.setSuspensions(2);
             behaviorRepository.save(highRiskBehavior);
 
             results.append(String.format(
@@ -74,30 +74,30 @@ private BehaviorRepository behaviorRepository;
             Student mediumRiskStudent = new Student("Medium Risk", "10th");
             studentRepository.save(mediumRiskStudent);
 
-// Academic: below 70% for +25 points
+
             AcademicPerformance medRiskAcademic = new AcademicPerformance();
             medRiskAcademic.setStudent(mediumRiskStudent);
             medRiskAcademic.setSemester("2024-Fall");
             medRiskAcademic.setCourse("Science");
-            medRiskAcademic.setGrade(new BigDecimal("68")); // <70 → +25
-            medRiskAcademic.setStateAssessmentMath(510);    // >500 (no extra)
+            medRiskAcademic.setGrade(new BigDecimal("68"));
+            medRiskAcademic.setStateAssessmentMath(510);
             academicPerformanceRepository.save(medRiskAcademic);
 
-// Attendance: rate below 90% for +20 points
+
             Attendance medRiskAttendance = new Attendance();
             medRiskAttendance.setStudent(mediumRiskStudent);
             medRiskAttendance.setSemester("2024-Fall");
-            medRiskAttendance.setAttendanceRate(new BigDecimal("88")); // <90 → +20
-            medRiskAttendance.setAbsentDays(4); // <10 (no points)
-            medRiskAttendance.setTardyDays(2);  // <5 (no points)
+            medRiskAttendance.setAttendanceRate(new BigDecimal("88"));
+            medRiskAttendance.setAbsentDays(4);
+            medRiskAttendance.setTardyDays(2);
             attendanceRepository.save(medRiskAttendance);
 
 // Behavior: no risk
             Behavior medRiskBehavior = new Behavior();
             medRiskBehavior.setStudent(mediumRiskStudent);
             medRiskBehavior.setSemester("2024-Fall");
-            medRiskBehavior.setDisciplinaryActions(0); // no points
-            medRiskBehavior.setSuspensions(0);         // no points
+            medRiskBehavior.setDisciplinaryActions(0);
+            medRiskBehavior.setSuspensions(0);
             behaviorRepository.save(medRiskBehavior);
 
             results.append(String.format(
@@ -112,14 +112,14 @@ private BehaviorRepository behaviorRepository;
             lowRiskAcademic.setStudent(lowRiskStudent);
             lowRiskAcademic.setSemester("2024-Fall");
             lowRiskAcademic.setCourse("English");
-            lowRiskAcademic.setGrade(new BigDecimal("88")); // Well above threshold
-            lowRiskAcademic.setStateAssessmentMath(550);    // Well above threshold
+            lowRiskAcademic.setGrade(new BigDecimal("88"));
+            lowRiskAcademic.setStateAssessmentMath(550);
             academicPerformanceRepository.save(lowRiskAcademic);
 
             Attendance lowRiskAttendance = new Attendance();
             lowRiskAttendance.setStudent(lowRiskStudent);
             lowRiskAttendance.setSemester("2024-Fall");
-            lowRiskAttendance.setAttendanceRate(new BigDecimal("96")); // Excellent
+            lowRiskAttendance.setAttendanceRate(new BigDecimal("96"));
             lowRiskAttendance.setAbsentDays(2);
             lowRiskAttendance.setTardyDays(1);
             attendanceRepository.save(lowRiskAttendance);

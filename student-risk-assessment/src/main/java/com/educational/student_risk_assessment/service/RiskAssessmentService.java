@@ -34,21 +34,21 @@ public class RiskAssessmentService {
         Student student = studentRepository.findById(studentUuid)
                 .orElseThrow(() -> new RuntimeException("Student not found with ID: " + studentId));
 
-        // Calculate individual risk components
+
         BigDecimal academicScore = calculateAcademicRisk(studentUuid, semester);
         BigDecimal attendanceScore = calculateAttendanceRisk(studentUuid, semester);
         BigDecimal behaviorScore = calculateBehaviorRisk(studentUuid, semester);
         BigDecimal tardinessScore = calculateTardinessRisk(studentUuid, semester);
 
-        // Calculate total risk score
+
         BigDecimal totalScore = academicScore.add(attendanceScore)
                 .add(behaviorScore)
                 .add(tardinessScore);
 
-        // Determine risk level
+
         String riskLevel = determineRiskLevel(totalScore);
 
-        // Build result
+
         StudentRiskAssessment assessment = new StudentRiskAssessment(
                 studentUuid, student.getName(), semester, totalScore, riskLevel
         );
@@ -67,13 +67,12 @@ public class RiskAssessmentService {
         BigDecimal score = BigDecimal.ZERO;
 
         for (AcademicPerformance performance : performances) {
-            // Course grades below 70% = 25 points
+
             if (performance.getGrade() != null &&
                     performance.getGrade().compareTo(new BigDecimal("70")) < 0) {
                 score = score.add(new BigDecimal("25"));
             }
 
-            // State assessment scores below 500 = 15 points
             if (performance.getStateAssessmentEla() != null &&
                     performance.getStateAssessmentEla() < 500) {
                 score = score.add(new BigDecimal("15"));
@@ -85,7 +84,6 @@ public class RiskAssessmentService {
             }
         }
 
-        // Cap at 40 points (40% weight)
         return score.min(new BigDecimal("40"));
     }
 
@@ -94,18 +92,16 @@ public class RiskAssessmentService {
                 .map(attendance -> {
                     BigDecimal score = BigDecimal.ZERO;
 
-                    // Attendance rate < 90% = 20 points
                     if (attendance.getAttendanceRate() != null &&
                             attendance.getAttendanceRate().compareTo(new BigDecimal("90")) < 0) {
                         score = score.add(new BigDecimal("20"));
                     }
 
-                    // Absent days > 10 = 10 points
                     if (attendance.getAbsentDays() != null && attendance.getAbsentDays() > 10) {
                         score = score.add(new BigDecimal("10"));
                     }
 
-                    return score.min(new BigDecimal("30")); // Cap at 30 points (30% weight)
+                    return score.min(new BigDecimal("30"));
                 })
                 .orElse(BigDecimal.ZERO);
     }
@@ -115,18 +111,16 @@ public class RiskAssessmentService {
                 .map(behavior -> {
                     BigDecimal score = BigDecimal.ZERO;
 
-                    // Disciplinary actions > 2 = 15 points
                     if (behavior.getDisciplinaryActions() != null &&
                             behavior.getDisciplinaryActions() > 2) {
                         score = score.add(new BigDecimal("15"));
                     }
 
-                    // Suspensions > 0 = 5 points
                     if (behavior.getSuspensions() != null && behavior.getSuspensions() > 0) {
                         score = score.add(new BigDecimal("5"));
                     }
 
-                    return score.min(new BigDecimal("20")); // Cap at 20 points (20% weight)
+                    return score.min(new BigDecimal("20"));
                 })
                 .orElse(BigDecimal.ZERO);
     }
@@ -136,12 +130,11 @@ public class RiskAssessmentService {
                 .map(attendance -> {
                     BigDecimal score = BigDecimal.ZERO;
 
-                    // Tardy days > 5 = 10 points
                     if (attendance.getTardyDays() != null && attendance.getTardyDays() > 5) {
                         score = score.add(new BigDecimal("10"));
                     }
 
-                    return score.min(new BigDecimal("10")); // Cap at 10 points (10% weight)
+                    return score.min(new BigDecimal("10"));
                 })
                 .orElse(BigDecimal.ZERO);
     }
@@ -167,7 +160,6 @@ public class RiskAssessmentService {
 
             RiskLevel studentRiskLevel = RiskLevel.valueOf(assessment.getRiskLevel());
 
-            // Check if student meets minimum risk threshold
             if (shouldIncludeStudent(studentRiskLevel, minimumRisk)) {
                 atRiskStudents.add(new AtRiskStudent(
                         student.getId(),
@@ -186,7 +178,6 @@ public class RiskAssessmentService {
     private boolean shouldIncludeStudent(RiskLevel studentLevel, RiskLevel minimumLevel) {
         if (minimumLevel == null) return true;
 
-        // HIGH > MEDIUM > LOW
         int studentPriority = getRiskPriority(studentLevel);
         int minimumPriority = getRiskPriority(minimumLevel);
 
@@ -203,8 +194,7 @@ public class RiskAssessmentService {
     }
 
     public void notifyStakeholders(List<AtRiskStudent> atRiskStudents) {
-        // Placeholder implementation for notification logic
-        // In a real system, this would send emails, create alerts, etc.
+
         System.out.println("Notifying stakeholders about " + atRiskStudents.size() + " at-risk students");
 
         for (AtRiskStudent student : atRiskStudents) {
@@ -216,12 +206,10 @@ public class RiskAssessmentService {
 
 
     public List<InterventionRecommendation> recommendInterventionsForStudent(String studentId, String semester) {
-        // Calculate the student's risk breakdown using your scoring logic
         StudentRiskAssessment assessment = calculateRiskScore(studentId, semester);
 
         List<InterventionRecommendation> recommendations = new ArrayList<>();
 
-        // Standard recommendations based on risk level
         if ("HIGH".equals(assessment.getRiskLevel())) {
             recommendations.add(new InterventionRecommendation(
                     "Intensive Academic Support",
@@ -253,7 +241,7 @@ public class RiskAssessmentService {
             System.out.println("DEBUG: Unexpected risk level: " + assessment.getRiskLevel());
         }
 
-        // Additional targeted suggestions based on risk component breakdowns
+
         if (assessment.getAcademicScore().compareTo(new java.math.BigDecimal("20")) >= 0) {
             recommendations.add(new InterventionRecommendation(
                     "Subject-Specific Tutoring",

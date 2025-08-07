@@ -14,7 +14,7 @@ public class InterventionProgressUpdate {
     private LocalDate updatedOn;
 
     @Pattern(regexp = "ON_TRACK|NOT_ON_TRACK|COMPLETED", message = "Status must be ON_TRACK, NOT_ON_TRACK, or COMPLETED.")
-    private String status; // Optional but validated if present
+    private String status;
 
     // Getters and setters
     public BigDecimal getCurrentScore() { return currentScore; }

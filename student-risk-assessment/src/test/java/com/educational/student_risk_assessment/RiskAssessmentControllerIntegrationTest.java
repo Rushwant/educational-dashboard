@@ -55,37 +55,36 @@ class RiskAssessmentControllerIntegrationTest {
     }
 
     void setupTestData() {
-        // Create high-risk student with complete data
+
         highRiskStudent = new Student();
         highRiskStudent.setName("High Risk Test Student");
         highRiskStudent.setGrade("9th");
         highRiskStudent = studentRepository.save(highRiskStudent);
 
-        // Create high-risk academic performance
+
         AcademicPerformance academic = new AcademicPerformance();
         academic.setStudent(highRiskStudent);
         academic.setSemester(semester);
-        academic.setGrade(new BigDecimal("65")); // Below 70%
+        academic.setGrade(new BigDecimal("65"));
         academic.setCourse("Math");
-        academic.setStateAssessmentEla(450); // Below 500
-        academic.setStateAssessmentMath(480); // Below 500
+        academic.setStateAssessmentEla(450);
+        academic.setStateAssessmentMath(480);
         academicPerformanceRepository.save(academic);
 
-        // Create high-risk attendance
         Attendance attendance = new Attendance();
         attendance.setStudent(highRiskStudent);
         attendance.setSemester(semester);
-        attendance.setAttendanceRate(new BigDecimal("85")); // Below 90%
-        attendance.setAbsentDays(15); // Over 10
-        attendance.setTardyDays(8); // Over 5
+        attendance.setAttendanceRate(new BigDecimal("85"));
+        attendance.setAbsentDays(15);
+        attendance.setTardyDays(8);
         attendanceRepository.save(attendance);
 
-        // Create high-risk behavior
+
         Behavior behavior = new Behavior();
         behavior.setStudent(highRiskStudent);
         behavior.setSemester(semester);
-        behavior.setDisciplinaryActions(5); // Over 2
-        behavior.setSuspensions(2); // Over 0
+        behavior.setDisciplinaryActions(5);
+        behavior.setSuspensions(2);
         behaviorRepository.save(behavior);
     }
 

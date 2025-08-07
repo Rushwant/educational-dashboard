@@ -62,29 +62,28 @@ class RiskAssessmentServiceTest {
 
     @Test
     void calculateRiskScore_HighRiskStudent_ReturnsCorrectScore() {
-        // Arrange - Create high-risk academic performance
+
         AcademicPerformance academicPerformance = new AcademicPerformance();
         academicPerformance.setStudent(testStudent);
         academicPerformance.setSemester(semester);
-        academicPerformance.setGrade(new BigDecimal("65")); // Below 70% = 25 points
-        academicPerformance.setStateAssessmentEla(450); // Below 500 = 15 points
+        academicPerformance.setGrade(new BigDecimal("65"));
+        academicPerformance.setStateAssessmentEla(450);
 
-        // High-risk attendance
+
         Attendance attendance = new Attendance();
         attendance.setStudent(testStudent);
         attendance.setSemester(semester);
-        attendance.setAttendanceRate(new BigDecimal("85")); // Below 90% = 20 points
-        attendance.setAbsentDays(15); // Over 10 = 10 points
-        attendance.setTardyDays(8); // Over 5 = 10 points
+        attendance.setAttendanceRate(new BigDecimal("85"));
+        attendance.setAbsentDays(15);
+        attendance.setTardyDays(8);
 
-        // High-risk behavior
+
         Behavior behavior = new Behavior();
         behavior.setStudent(testStudent);
         behavior.setSemester(semester);
-        behavior.setDisciplinaryActions(5); // Over 2 = 15 points
-        behavior.setSuspensions(2); // Over 0 = 5 points
+        behavior.setDisciplinaryActions(5);
+        behavior.setSuspensions(2);
 
-        // Mock repository calls
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(testStudent));
         when(academicPerformanceRepository.findByStudentIdAndSemester(studentId, semester))
                 .thenReturn(Arrays.asList(academicPerformance));
@@ -93,22 +92,20 @@ class RiskAssessmentServiceTest {
         when(behaviorRepository.findByStudentIdAndSemester(studentId, semester))
                 .thenReturn(Optional.of(behavior));
 
-        // Act
         StudentRiskAssessment result = riskAssessmentService.calculateRiskScore(studentId.toString(), semester);
 
-        // Assert
         assertNotNull(result);
         assertEquals(studentId, result.getStudentId());
         assertEquals("John Doe", result.getStudentName());
         assertEquals(semester, result.getSemester());
 
-        // Verify score calculations
-        assertEquals(new BigDecimal("40"), result.getAcademicScore()); // 25 + 15
-        assertEquals(new BigDecimal("30"), result.getAttendanceScore()); // 20 + 10
-        assertEquals(new BigDecimal("20"), result.getBehaviorScore()); // 15 + 5
-        assertEquals(new BigDecimal("10"), result.getTardinessScore()); // 10
-        assertEquals(new BigDecimal("100"), result.getTotalRiskScore()); // 40 + 30 + 20 + 10
-        assertEquals("HIGH", result.getRiskLevel()); // FIXED: String comparison
+
+        assertEquals(new BigDecimal("40"), result.getAcademicScore());
+        assertEquals(new BigDecimal("30"), result.getAttendanceScore());
+        assertEquals(new BigDecimal("20"), result.getBehaviorScore());
+        assertEquals(new BigDecimal("10"), result.getTardinessScore());
+        assertEquals(new BigDecimal("100"), result.getTotalRiskScore());
+        assertEquals("HIGH", result.getRiskLevel());
 
         verify(studentRepository).findById(studentId);
         verify(academicPerformanceRepository).findByStudentIdAndSemester(studentId, semester);
@@ -118,25 +115,25 @@ class RiskAssessmentServiceTest {
 
     @Test
     void calculateRiskScore_LowRiskStudent_ReturnsCorrectScore() {
-        // Arrange - Create low-risk student data
+
         AcademicPerformance academicPerformance = new AcademicPerformance();
         academicPerformance.setStudent(testStudent);
         academicPerformance.setSemester(semester);
-        academicPerformance.setGrade(new BigDecimal("85")); // Above 70%
-        academicPerformance.setStateAssessmentEla(550); // Above 500
+        academicPerformance.setGrade(new BigDecimal("85"));
+        academicPerformance.setStateAssessmentEla(550);
 
         Attendance attendance = new Attendance();
         attendance.setStudent(testStudent);
         attendance.setSemester(semester);
-        attendance.setAttendanceRate(new BigDecimal("95")); // Above 90%
-        attendance.setAbsentDays(3); // Under 10
-        attendance.setTardyDays(2); // Under 5
+        attendance.setAttendanceRate(new BigDecimal("95"));
+        attendance.setAbsentDays(3);
+        attendance.setTardyDays(2);
 
         Behavior behavior = new Behavior();
         behavior.setStudent(testStudent);
         behavior.setSemester(semester);
-        behavior.setDisciplinaryActions(1); // Under 2
-        behavior.setSuspensions(0); // No suspensions
+        behavior.setDisciplinaryActions(1);
+        behavior.setSuspensions(0);
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(testStudent));
         when(academicPerformanceRepository.findByStudentIdAndSemester(studentId, semester))
@@ -146,28 +143,26 @@ class RiskAssessmentServiceTest {
         when(behaviorRepository.findByStudentIdAndSemester(studentId, semester))
                 .thenReturn(Optional.of(behavior));
 
-        // Act
+
         StudentRiskAssessment result = riskAssessmentService.calculateRiskScore(studentId.toString(), semester);
 
-        // Assert
         assertEquals(BigDecimal.ZERO, result.getAcademicScore());
         assertEquals(BigDecimal.ZERO, result.getAttendanceScore());
         assertEquals(BigDecimal.ZERO, result.getBehaviorScore());
         assertEquals(BigDecimal.ZERO, result.getTardinessScore());
         assertEquals(BigDecimal.ZERO, result.getTotalRiskScore());
-        assertEquals("LOW", result.getRiskLevel()); // FIXED: String comparison
+        assertEquals("LOW", result.getRiskLevel());
         verify(studentRepository).findById(studentId);
         verify(academicPerformanceRepository).findByStudentIdAndSemester(studentId, semester);
-        verify(attendanceRepository, times(2)).findByStudentIdAndSemester(studentId, semester); // FIXED
+        verify(attendanceRepository, times(2)).findByStudentIdAndSemester(studentId, semester);
         verify(behaviorRepository).findByStudentIdAndSemester(studentId, semester);
     }
 
     @Test
     void calculateRiskScore_StudentNotFound_ThrowsException() {
-        // Arrange
         when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
-        // Act & Assert
+
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             riskAssessmentService.calculateRiskScore(studentId.toString(), semester);
         });
@@ -179,7 +174,6 @@ class RiskAssessmentServiceTest {
 
     @Test
     void identifyAtRiskStudents_WithFilters_ReturnsFilteredResults() {
-        // Arrange
         Student highRiskStudent = new Student();
         highRiskStudent.setId(UUID.randomUUID());
         highRiskStudent.setName("High Risk Student");
@@ -199,14 +193,12 @@ class RiskAssessmentServiceTest {
 
         mockMediumRiskData(mediumRiskStudent);
 
-        // Act
+
         List<AtRiskStudent> results = riskAssessmentService.identifyAtRiskStudents(semester, RiskLevel.MEDIUM);
 
-        // Assert
         assertNotNull(results);
-        assertEquals(2, results.size()); // Both high and medium risk students should be returned
+        assertEquals(2, results.size());
 
-        // Verify high risk student
         AtRiskStudent highRisk = results.stream()
                 .filter(s -> s.getStudentName().equals("High Risk Student"))
                 .findFirst()
@@ -214,7 +206,6 @@ class RiskAssessmentServiceTest {
         assertNotNull(highRisk);
         assertEquals("HIGH", highRisk.getRiskLevel());
 
-        // Verify medium risk student
         AtRiskStudent mediumRisk = results.stream()
                 .filter(s -> s.getStudentName().equals("Medium Risk Student"))
                 .findFirst()
@@ -225,7 +216,6 @@ class RiskAssessmentServiceTest {
 
     @Test
     void identifyAtRiskStudents_OnlyHighRisk_ReturnsFilteredResults() {
-        // Arrange
         Student highRiskStudent = new Student();
         highRiskStudent.setId(UUID.randomUUID());
         highRiskStudent.setName("High Risk Student");
@@ -236,17 +226,14 @@ class RiskAssessmentServiceTest {
 
         when(studentRepository.findAll()).thenReturn(Arrays.asList(highRiskStudent, lowRiskStudent));
 
-        // FIXED: Add missing findById mocks
         when(studentRepository.findById(highRiskStudent.getId())).thenReturn(Optional.of(highRiskStudent));
         when(studentRepository.findById(lowRiskStudent.getId())).thenReturn(Optional.of(lowRiskStudent));
 
         mockHighRiskData(highRiskStudent);
         mockLowRiskData(lowRiskStudent);
 
-        // Act
         List<AtRiskStudent> results = riskAssessmentService.identifyAtRiskStudents(semester, RiskLevel.HIGH);
 
-        // Assert
         assertEquals(1, results.size());
         assertEquals("High Risk Student", results.get(0).getStudentName());
         assertEquals("HIGH", results.get(0).getRiskLevel());
@@ -317,7 +304,6 @@ class RiskAssessmentServiceTest {
         when(academicPerformanceRepository.findByStudentIdAndSemester(student.getId(), semester))
                 .thenReturn(Arrays.asList(academic));
 
-        // FIXED: Allow multiple calls to attendance repository
         when(attendanceRepository.findByStudentIdAndSemester(student.getId(), semester))
                 .thenReturn(Optional.of(attendance));
 

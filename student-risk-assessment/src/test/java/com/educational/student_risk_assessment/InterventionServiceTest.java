@@ -54,7 +54,7 @@ class InterventionServiceTest {
 
     @Test
     void createIntervention_ValidRequest_ReturnsIntervention() {
-        // Arrange
+
         CreateInterventionRequest request = new CreateInterventionRequest();
         request.setStudentId(studentId);
         request.setInterventionType("Academic Support");
@@ -75,10 +75,8 @@ class InterventionServiceTest {
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(testStudent));
         when(interventionRepository.save(any(Intervention.class))).thenReturn(savedIntervention);
 
-        // Act
         Intervention result = interventionService.createIntervention(request);
 
-        // Assert
         assertNotNull(result);
         assertEquals(interventionId, result.getId());
         assertEquals("Academic Support", result.getInterventionType());
@@ -92,13 +90,11 @@ class InterventionServiceTest {
 
     @Test
     void createIntervention_StudentNotFound_ThrowsException() {
-        // Arrange
         CreateInterventionRequest request = new CreateInterventionRequest();
         request.setStudentId(studentId);
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             interventionService.createIntervention(request);
         });
@@ -110,7 +106,6 @@ class InterventionServiceTest {
 
     @Test
     void updateInterventionProgress_ValidUpdate_ReturnsUpdatedIntervention() {
-        // Arrange
         Intervention existingIntervention = new Intervention();
         existingIntervention.setId(interventionId);
         existingIntervention.setStudent(testStudent);
@@ -128,10 +123,8 @@ class InterventionServiceTest {
         when(interventionRepository.findById(interventionId)).thenReturn(Optional.of(existingIntervention));
         when(interventionRepository.save(any(Intervention.class))).thenReturn(existingIntervention);
 
-        // Act
         Intervention result = interventionService.updateInterventionProgress(interventionId.toString(), update);
 
-        // Assert
         assertNotNull(result);
         assertEquals(new BigDecimal("60"), result.getCurrentScore());
 
@@ -141,7 +134,6 @@ class InterventionServiceTest {
 
     @Test
     void getStudentInterventions_ValidStudentId_ReturnsInterventions() {
-        // Arrange
         Intervention intervention1 = new Intervention();
         intervention1.setId(UUID.randomUUID());
         intervention1.setInterventionType("Academic Support");
@@ -155,10 +147,8 @@ class InterventionServiceTest {
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(testStudent));
         when(interventionRepository.findByStudentId(studentId)).thenReturn(interventions);
 
-        // Act
         List<Intervention> result = interventionService.getStudentInterventions(studentId.toString());
 
-        // Assert
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("Academic Support", result.get(0).getInterventionType());
@@ -169,52 +159,46 @@ class InterventionServiceTest {
 
     @Test
     void isStudentOnTrack_MidpointProgress_ReturnsTrue() {
-        // Arrange
         Intervention intervention = new Intervention();
         intervention.setId(interventionId);
-        intervention.setStartDate(LocalDate.now().minusDays(30)); // 30 days ago
-        intervention.setTargetCompletionDate(LocalDate.now().plusDays(30)); // 30 days from now
+        intervention.setStartDate(LocalDate.now().minusDays(30));
+        intervention.setTargetCompletionDate(LocalDate.now().plusDays(30));
         intervention.setStartScore(new BigDecimal("80"));
-        intervention.setCurrentScore(new BigDecimal("65")); // 50% progress toward goal of 50
+        intervention.setCurrentScore(new BigDecimal("65"));
         intervention.setGoalScore(new BigDecimal("50"));
 
         when(interventionRepository.findById(interventionId)).thenReturn(Optional.of(intervention));
 
-        // Act
         boolean result = interventionService.isStudentOnTrack(interventionId.toString());
 
-        // Assert
-        assertTrue(result); // Should be on track with 50% progress at 50% time
+        assertTrue(result);
         verify(interventionRepository).findById(interventionId);
     }
 
     @Test
     void isStudentOnTrack_BehindSchedule_ReturnsFalse() {
-        // Arrange
         Intervention intervention = new Intervention();
         intervention.setId(interventionId);
-        intervention.setStartDate(LocalDate.now().minusDays(75)); // Started 75 days ago
-        intervention.setTargetCompletionDate(LocalDate.now().plusDays(25)); // Ends in 25 days
+        intervention.setStartDate(LocalDate.now().minusDays(75));
+        intervention.setTargetCompletionDate(LocalDate.now().plusDays(25));
         intervention.setStartScore(new BigDecimal("80"));
-        intervention.setCurrentScore(new BigDecimal("75")); // Only 16.7% progress
-        intervention.setGoalScore(new BigDecimal("50")); // Need 30 point reduction
+        intervention.setCurrentScore(new BigDecimal("75"));
+        intervention.setGoalScore(new BigDecimal("50"));
 
         when(interventionRepository.findById(interventionId)).thenReturn(Optional.of(intervention));
 
-        // Act
+
         boolean result = interventionService.isStudentOnTrack(interventionId.toString());
 
-        // Assert
-        assertFalse(result); // Should be behind schedule (75% time, 16.7% progress)
+        assertFalse(result);
         verify(interventionRepository).findById(interventionId);
     }
 
     @Test
     void isStudentOnTrack_InterventionNotFound_ThrowsException() {
-        // Arrange
+
         when(interventionRepository.findById(interventionId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             interventionService.isStudentOnTrack(interventionId.toString());
         });

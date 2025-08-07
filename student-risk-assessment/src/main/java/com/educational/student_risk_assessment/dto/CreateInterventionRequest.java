@@ -30,7 +30,7 @@ public class CreateInterventionRequest {
 
     @DecimalMin(value = "0.0", message = "Current score must be at least 0.")
     @DecimalMax(value = "100.0", message = "Current score must not exceed 100.")
-    private BigDecimal currentScore; // Optional on create
+    private BigDecimal currentScore;
 
     // Getters and setters
     public UUID getStudentId() { return studentId; }

@@ -42,7 +42,7 @@ public class Intervention {
 
     @Size(max = 20)
     @Column(name = "status", length = 20)
-    private String status; // ON_TRACK, NOT_ON_TRACK, COMPLETED
+    private String status;
 
     @CreationTimestamp
     @Column(name = "created_at")

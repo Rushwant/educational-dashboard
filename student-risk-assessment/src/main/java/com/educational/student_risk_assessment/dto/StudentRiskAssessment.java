@@ -9,9 +9,9 @@ public class StudentRiskAssessment {
     private String studentName;
     private String semester;
     private BigDecimal totalRiskScore;
-    private String riskLevel; // HIGH, MEDIUM, LOW
+    private String riskLevel;
 
-    // Score breakdown
+
     private BigDecimal academicScore;
     private BigDecimal attendanceScore;
     private BigDecimal behaviorScore;

@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), req.getRequestURI());
     }
 
-    // Catch-all handler
+    // Catch-all
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleAll(
             Exception ex, HttpServletRequest req) {
@@ -69,8 +69,6 @@ public class GlobalExceptionHandler {
     }
 
 
-
-    // Helper
     private ResponseEntity<ApiErrorResponse> buildResponse(HttpStatus status, String error, String message, String path) {
         ApiErrorResponse resp = new ApiErrorResponse(status.value(), error, message, path);
         return new ResponseEntity<>(resp, status);

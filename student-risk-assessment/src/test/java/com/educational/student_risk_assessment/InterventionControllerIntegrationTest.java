@@ -41,12 +41,11 @@ class InterventionControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     private MockMvc mockMvc;
-    private static Student testStudent; // Make static to persist across test methods
-    private static String interventionId; // Make static to persist across test methods
+    private static Student testStudent;
+    private static String interventionId;
 
     @BeforeAll
     static void setupClass(@Autowired StudentRepository studentRepository) {
-        // Create test student once for all tests
         testStudent = new Student();
         testStudent.setName("Integration Test Student");
         testStudent.setGrade("10th");
@@ -65,7 +64,6 @@ class InterventionControllerIntegrationTest {
     @Order(1)
     @WithMockUser(roles = "TEACHER")
     void createIntervention_ValidRequest_ReturnsCreatedIntervention() throws Exception {
-        // Arrange
         CreateInterventionRequest request = new CreateInterventionRequest();
         request.setStudentId(testStudent.getId());
         request.setInterventionType("Academic Support");
@@ -74,23 +72,22 @@ class InterventionControllerIntegrationTest {
         request.setStartScore(new BigDecimal("75"));
         request.setGoalScore(new BigDecimal("45"));
 
-        // Act & Assert
+
         mockMvc.perform(post("/api/interventions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
-                .andExpect(status().isOk()) // Your API returns 200, not 201
-                .andExpect(jsonPath("$.student.id").value(testStudent.getId().toString())) // Fixed: API returns nested student object
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.student.id").value(testStudent.getId().toString()))
                 .andExpect(jsonPath("$.interventionType").value("Academic Support"))
                 .andExpect(jsonPath("$.startScore").value(75))
                 .andExpect(jsonPath("$.goalScore").value(45))
                 .andExpect(jsonPath("$.status").value("ON_TRACK"))
                 .andDo(result -> {
-                    // Store intervention ID for future tests
                     String response = result.getResponse().getContentAsString();
                     JsonNode jsonNode = objectMapper.readTree(response);
                     interventionId = jsonNode.get("id").asText();
-                    System.out.println("Created intervention ID: " + interventionId); // Debug
+                    System.out.println("Created intervention ID: " + interventionId);
                 });
     }
 
@@ -98,14 +95,13 @@ class InterventionControllerIntegrationTest {
     @Order(2)
     @WithMockUser(roles = "ADMIN")
     void updateInterventionProgress_ValidRequest_ReturnsUpdatedIntervention() throws Exception {
-        // Arrange
+
         InterventionProgressUpdate update = new InterventionProgressUpdate();
         update.setCurrentScore(new BigDecimal("60"));
         update.setUpdatedOn(LocalDate.now());
         update.setStatus("ON_TRACK");
 
-        // Act & Assert
-        mockMvc.perform(put("/api/interventions/{id}/progress", interventionId) // Fixed: Use actual ID
+        mockMvc.perform(put("/api/interventions/{id}/progress", interventionId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(update)))
                 .andDo(print())
@@ -118,12 +114,11 @@ class InterventionControllerIntegrationTest {
     @Order(3)
     @WithMockUser(roles = "TEACHER")
     void getStudentInterventions_ValidStudentId_ReturnsInterventions() throws Exception {
-        // Act & Assert
         mockMvc.perform(get("/api/interventions/student/{studentId}", testStudent.getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].student.id").value(testStudent.getId().toString())) // Fixed: nested student object
+                .andExpect(jsonPath("$[0].student.id").value(testStudent.getId().toString()))
                 .andExpect(jsonPath("$[0].interventionType").value("Academic Support"));
     }
 
@@ -131,11 +126,9 @@ class InterventionControllerIntegrationTest {
     @Order(4)
     @WithMockUser(roles = "PARENT", username = "parent_test")
     void getStudentInterventions_AsParent_ReturnsOnlyOwnChildrenData() throws Exception {
-        // This test assumes your AuthorizationService allows parent access
-        // You might need to mock the canAccessStudentData method to return true
         mockMvc.perform(get("/api/interventions/student/{studentId}", testStudent.getId()))
                 .andDo(print())
-                .andExpect(status().isOk()) // Should work if parent has access
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
 
@@ -145,31 +138,27 @@ class InterventionControllerIntegrationTest {
     void getStudentInterventions_AsUnauthorizedStudent_ReturnsForbidden() throws Exception {
         mockMvc.perform(get("/api/interventions/student/{studentId}", testStudent.getId()))
                 .andDo(print())
-                .andExpect(status().isForbidden()); // Your API returns 403
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @Order(6)
     @WithMockUser(roles = "TEACHER")
     void createIntervention_InvalidRequest_ReturnsBadRequest() throws Exception {
-        // Arrange - Empty request (missing required fields)
         CreateInterventionRequest invalidRequest = new CreateInterventionRequest();
-        // Don't set any fields to trigger validation errors
 
-        // Act & Assert
         mockMvc.perform(post("/api/interventions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andDo(print())
-                .andExpect(status().isBadRequest()) // Your API correctly returns 400
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.error").value("Validation Error")); // Based on your error response format
+                .andExpect(jsonPath("$.error").value("Validation Error"));
     }
 
     @Test
     @Order(7)
     void createIntervention_Unauthorized_ReturnsForbidden() throws Exception {
-        // Arrange
         CreateInterventionRequest request = new CreateInterventionRequest();
         request.setStudentId(testStudent.getId());
         request.setInterventionType("Academic Support");
@@ -178,11 +167,10 @@ class InterventionControllerIntegrationTest {
         request.setStartScore(new BigDecimal("75"));
         request.setGoalScore(new BigDecimal("45"));
 
-        // Act & Assert - No authentication
         mockMvc.perform(post("/api/interventions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
-                .andExpect(status().isForbidden()); // Your API returns 403, not 401
+                .andExpect(status().isForbidden());
     }
 }
