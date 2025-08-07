@@ -7,7 +7,15 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "academic_performance")
+@Table(name = "academic_performance",
+        indexes = {
+                @Index(name = "idx_academic_student_semester", columnList = "student_id, semester"),
+                @Index(name = "idx_academic_student_id", columnList = "student_id"),
+                @Index(name = "idx_academic_semester", columnList = "semester"),
+                @Index(name = "idx_academic_grade", columnList = "grade"),
+                @Index(name = "idx_academic_ela_score", columnList = "state_assessment_ela"),
+                @Index(name = "idx_academic_math_score", columnList = "state_assessment_math")
+        })
 public class AcademicPerformance {
 
     @Id
