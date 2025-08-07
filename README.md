@@ -15,7 +15,7 @@ The Educational Dashboard is a comprehensive Spring Boot application designed to
 
 ### Step 1: Clone the Repository
 
-    git clone <repository-url>
+    git clone https://github.com/Rushwant/educational-dashboard.git
     cd educational-dashboard
 
 
