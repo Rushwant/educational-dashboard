@@ -6,7 +6,14 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 @Entity
-@Table(name = "behavior")
+@Table(name = "behavior",
+        indexes = {
+                @Index(name = "idx_behavior_student_semester", columnList = "student_id, semester"),
+                @Index(name = "idx_behavior_student_id", columnList = "student_id"),
+                @Index(name = "idx_behavior_semester", columnList = "semester"),
+                @Index(name = "idx_behavior_disciplinary", columnList = "disciplinary_actions"),
+                @Index(name = "idx_behavior_suspensions", columnList = "suspensions")
+        })
 public class Behavior {
 
     @Id
