@@ -7,7 +7,15 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "attendance")
+@Table(name = "attendance",
+        indexes = {
+                @Index(name = "idx_attendance_student_semester", columnList = "student_id, semester"),
+                @Index(name = "idx_attendance_student_id", columnList = "student_id"),
+                @Index(name = "idx_attendance_semester", columnList = "semester"),
+                @Index(name = "idx_attendance_rate", columnList = "attendance_rate"),
+                @Index(name = "idx_attendance_absent_days", columnList = "absent_days"),
+                @Index(name = "idx_attendance_tardy_days", columnList = "tardy_days")
+        })
 public class Attendance {
 
     @Id
